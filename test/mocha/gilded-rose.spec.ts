@@ -28,9 +28,9 @@ describe('Gilded Rose', () => {
   });
 
   it('Quality of an item can Never be more than 50', () => {
-    const gildedRose = new GildedRose([new Item('foo', 0, 49)]);
+    const gildedRose = new GildedRose([new Item('Aged Brie', 0, 50)]);
     const items = gildedRose.updateQuality();
-    expect(items[0].quality).to.equal(47);
+    expect(items[0].quality).to.equal(50);
   });
 
   it('is Backstage pass and Quality of an item is not negative', () => {
@@ -43,7 +43,18 @@ describe('Gilded Rose', () => {
     const gildedRose = new GildedRose([new Item('foo', -3, 4)]);
     const items = gildedRose.updateQuality();
     expect(items[0].quality).to.equal(2);
+});
+
+  it('Item never has to be sold or decreases in Quality', () => {
+    const gildedRose = new GildedRose([new Item('Sulfuras, Hand of Ragnaros', 0, 4)]);
+    const items = gildedRose.updateQuality();
+    expect(items[0].quality).to.equal(4);
   });
 
+  it('SellIn date of item decreases by one', () => {
+      const gildedRose = new GildedRose([new Item('foo', 0, 4)]) //[new Item('Sulfuras, Hand of Ragnaros', 0, 4)], [new Item('Back Stage pass', 0, 4)]);
+      const items = gildedRose.updateQuality();
+      expect(items[0].sellIn).to.equal(-1);
+    });
 });
 

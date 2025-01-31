@@ -17,34 +17,34 @@ export class GildedRose {
     this.items = items;
   }
 
-  checkItemName(currentItemName: string) {
-    
-  }
 
   isQualityValid(currentItem: Item, incrementQualityBy: number) {
     if (currentItem.quality >= 0 && currentItem.quality < 50) {
       return true;
     }
     else  //(currentItem.quality + incrementQualityBy >= 50 || currentItem.quality + incrementQualityBy < 0)
-      console.log("In isQualityValid function, returns value: FALSE");
       return false; 
   }
 
   changeQuality(currentItem: Item, incrementQualityBy: number) {
-    currentItem.quality += incrementQualityBy;
-    return currentItem;
+    if (this.isQualityValid(currentItem, incrementQualityBy)) {
+      currentItem.quality += incrementQualityBy;  
+      return currentItem;
+    }
+    else {
+      return currentItem;
+    }
   }
 
   isBackstagePass(currentItem: Item) {
     if (currentItem.sellIn >= 6 && currentItem.sellIn <= 10) {
-      if (this.isQualityValid(currentItem, 2)) {
-        this.changeQuality(currentItem, 2)
+      this.changeQuality(currentItem, 2)
       } 
-    }
     else if (currentItem.sellIn >= 0 && currentItem.sellIn <= 5) {
-      if (this.isQualityValid(currentItem, 3)) {
-        this.changeQuality(currentItem, 3)
+      (this.changeQuality(currentItem, 3))
       } 
+    else if (currentItem.sellIn < 0) {
+      currentItem.quality = 0;
     }
     else {
       if (this.isQualityValid(currentItem, 1)) {
@@ -63,33 +63,39 @@ export class GildedRose {
       return false;
   }
 
-  degradeQuality(currentItem: Item) {
+  degradeQuality(currentItem: Item) : Item {
     if (currentItem.name == 'Aged Brie') {
       if (this.isQualityValid(currentItem, 1)) {
         this.changeQuality(currentItem, 1);
       }
     }
     else if (currentItem.name == 'Sulfuras, Hand of Ragnaros') {
-      return currentItem.quality;
+      return currentItem;
     }
     else if (currentItem.name == 'Backstage passes to a TAFKAL80ETC concert') {
       this.isBackstagePass(currentItem);
       }
     else {
-      if (this.withinSellInDate(currentItem) && this.isQualityValid(currentItem, -1)) {
+      if (this.withinSellInDate(currentItem)) {
         currentItem = this.changeQuality(currentItem, -1)
         }
-      else if (this.withinSellInDate(currentItem) && this.isQualityValid(currentItem, -2)) {
+      else {
         currentItem = this.changeQuality(currentItem, -2)
       }
     }
-    return currentItem.quality;
+    currentItem.sellIn -= 1;
+    return currentItem;
   }
 
   updateQuality() {
     for (let i = 0; i < this.items.length; i++) {
       this.items[i] = this.degradeQuality(this.items[i])
-      /*
+    }
+    return this.items;
+  }
+}
+
+/*
       if (this.items[i].name != 'Aged Brie' && this.items[i].name != 'Backstage passes to a TAFKAL80ETC concert') {
         if (this.items[i].quality > 0) {
           if (this.items[i].name != 'Sulfuras, Hand of Ragnaros') {
@@ -134,10 +140,3 @@ export class GildedRose {
         }
       }
       */
-    }
-
-    return this.items;
-  }
-}
-
-
