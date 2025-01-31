@@ -20,60 +20,76 @@ export class GildedRose {
   checkItemName(currentItemName: string) {
     
   }
-  isQualityZero(currentItemQuality: number) {
-    //if true -> return currentItemQuality
-    //if false, then call degradeQuality()
-    // return currentItemQuality
+
+  isQualityValid(currentItem: Item, incrementQualityBy: number) {
+    if (currentItem.quality >= 0 && currentItem.quality < 50) {
+      return true;
+    }
+    else  //(currentItem.quality + incrementQualityBy >= 50 || currentItem.quality + incrementQualityBy < 0)
+      console.log("In isQualityValid function, returns value: FALSE");
+      return false; 
   }
 
-  isQualityMax(currentItem: Item, incrementQuality: number) {
-    //if true -> return currentItemQuality --no cha
-    if (currentItem.quality)
-    //if false -> call degradeQuality || allow degradeQuality() to proceed?
+  changeQuality(currentItem: Item, incrementQualityBy: number) {
+    currentItem.quality += incrementQualityBy;
+    return currentItem;
   }
 
   isBackstagePass(currentItem: Item) {
     if (currentItem.sellIn >= 6 && currentItem.sellIn <= 10) {
-      currentItem.quality += 2;
+      if (this.isQualityValid(currentItem, 2)) {
+        this.changeQuality(currentItem, 2)
+      } 
     }
     else if (currentItem.sellIn >= 0 && currentItem.sellIn <= 5) {
-      currentItem.quality += 3;
+      if (this.isQualityValid(currentItem, 3)) {
+        this.changeQuality(currentItem, 3)
+      } 
     }
-    else (currentItem.sellIn > 10) {
-      this.increaseByOne(currentItem);
-    }
+    else {
+      if (this.isQualityValid(currentItem, 1)) {
+        this.changeQuality(currentItem, 1)
+      } 
+    } 
+    console.log("in IsBackstagePass function:,", currentItem);
     return currentItem;
   }
 
-  increaseByOne(currentItem: Item) {
-    currentItem.quality += 1;
-    return currentItem;
+  withinSellInDate(currentItem: Item) {
+    if (currentItem.sellIn >= 0) {
+      return true;
+    }
+    else 
+      return false;
   }
 
-  degradeQuality(currentItem) {
+  degradeQuality(currentItem: Item) {
     if (currentItem.name == 'Aged Brie') {
-      if (!this.isQualityMax(currentItem, 1)) {
-        false
+      if (this.isQualityValid(currentItem, 1)) {
+        this.changeQuality(currentItem, 1);
       }
-      else 
-        this.increaseByOne(currentItem);
     }
-
-    else if (currentItemName == 'Sulfuras, Hand of Ragnaros') {
-      this.items[i].quality = this.items[i].quality;
+    else if (currentItem.name == 'Sulfuras, Hand of Ragnaros') {
+      return currentItem.quality;
     }
     else if (currentItem.name == 'Backstage passes to a TAFKAL80ETC concert') {
       this.isBackstagePass(currentItem);
       }
+    else {
+      if (this.withinSellInDate(currentItem) && this.isQualityValid(currentItem, -1)) {
+        currentItem = this.changeQuality(currentItem, -1)
+        }
+      else if (this.withinSellInDate(currentItem) && this.isQualityValid(currentItem, -2)) {
+        currentItem = this.changeQuality(currentItem, -2)
+      }
     }
-    else
-      this.items[i].quality -= 1;
-
-    return this.items[i].quality;
+    return currentItem.quality;
   }
 
   updateQuality() {
     for (let i = 0; i < this.items.length; i++) {
+      this.items[i] = this.degradeQuality(this.items[i])
+      /*
       if (this.items[i].name != 'Aged Brie' && this.items[i].name != 'Backstage passes to a TAFKAL80ETC concert') {
         if (this.items[i].quality > 0) {
           if (this.items[i].name != 'Sulfuras, Hand of Ragnaros') {
@@ -117,6 +133,7 @@ export class GildedRose {
           }
         }
       }
+      */
     }
 
     return this.items;
